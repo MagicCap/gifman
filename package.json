@@ -1,6 +1,6 @@
 {
   "name": "gifman",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A GIF capture solution which combines several tools/libraries.",
   "main": "index.js",
   "author": "Jake Gealer",

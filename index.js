@@ -28,7 +28,7 @@ const uuid = require("uuid/v4");
 const fsNextra = require("fs-nextra");
 
 // Starts recording.
-const start = async (fps, x, y, width, height) => {
+const start = async (fps, x, y, width, height, displayId) => {
     if (recording) {
         throw new Error("Already recording.");
     }
@@ -43,6 +43,7 @@ const start = async (fps, x, y, width, height) => {
                 width: width,
                 height: height,
             },
+            screenId: displayId,
         };
         await aperture.startRecording(settings);
         recording = true;
