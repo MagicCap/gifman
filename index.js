@@ -57,7 +57,7 @@ const start = async (fps, x, y, width, height, displayInfo) => {
 }
 
 // Stops recording, encodes the file as a GIF and returns the GIF as a buffer.
-const stop = async () => {
+const stop = async mp4 => {
     if (!recording) {
         throw new Error("Not recording.");
     }
@@ -86,12 +86,37 @@ const stop = async () => {
         });
     }
 
+    // If MP4 is true, return the MP4 here.
+    if (mp4) {
+        const buffer = await fsNextra.readFile(mp4Fp);
+        await fsNextra.unlink(mp4Fp);
+        return buffer;
+    }
+
+    // This defines the pallete file.
+    const paletteFile = `${tempDir}/${uuid()}.png`;
+
+    const ffmpegPaleteGen = spawn(
+        ffmpeg, [
+            "-i", mp4Fp, "-vf", "palettegen", paletteFile
+        ],
+    )
+
+    await new Promise(res => {
+        ffmpegPaleteGen.on("close", code => {
+            if (code !== 0) {
+                throw new Error("GIF encoding failed.");
+            }
+            res();
+        });
+    });
+
     // We now have a MP4 file path. Time to turn it into a GIF!
     const tempFile = `${tempDir}/${uuid()}.gif`;
 
     const ffmpegProcess = spawn(
         ffmpeg, [
-            "-i", mp4Fp, tempFile
+            "-i", mp4Fp, "-i", paletteFile, "-lavfi", "paletteuse", tempFile
         ],
     );
 
@@ -105,6 +130,7 @@ const stop = async () => {
     });
 
     await fsNextra.unlink(mp4Fp);
+    await fsNextra.unlink(paletteFile);
     const buffer = await fsNextra.readFile(tempFile);
     await fsNextra.unlink(tempFile);
     return buffer;
