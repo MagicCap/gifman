@@ -13,7 +13,7 @@ if (platform === "darwin") {
 let recording = null;
 
 // Gets the FFMpeg binary location.
-const ffmpeg = require("ffmpeg-static").path;
+const ffmpeg = require("ffmpeg-static-magiccap").path;
 
 // Imports child process stuff.
 const { spawn } = require("child_process");
